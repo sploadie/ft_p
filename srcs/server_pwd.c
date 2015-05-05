@@ -1,32 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   server_pwd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/09 16:32:10 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/05 22:39:29 by tgauvrit         ###   ########.fr       */
+/*   Created: 2015/05/05 17:25:41 by tgauvrit          #+#    #+#             */
+/*   Updated: 2015/05/05 18:17:46 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#include "ft_p.h"
 
-# include "libft.h"
-# include <sys/types.h>
-# include <sys/uio.h>
-# include <unistd.h>
-
-# define GNL_BUF_SIZE 65
-
-typedef struct			s_spill
+char	*server_pwd(void)
 {
-	char				*text;
-	int					fd;
-	struct s_spill		*next;
-}						t_spill;
+	static char	*pwd = NULL;
 
-int						get_next_line(int const fd, char **line);
-
-#endif
+	if (pwd == NULL)
+		pwd = getcwd(malloc(1024), 1024);
+	return (pwd);
+}

@@ -6,7 +6,7 @@
 #    By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/20 16:35:37 by tgauvrit          #+#    #+#              #
-#    Updated: 2015/04/30 21:22:57 by tgauvrit         ###   ########.fr        #
+#    Updated: 2015/05/05 22:56:10 by tgauvrit         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,11 @@ FT_LIB_DIR =	./libft/
 
 SRC_DIR =		./srcs/
 
-SRC_COMPILED =	handle_sigint.o \
+SRC_COMPILED =	server_sendstr.o \
+				client_cmd.o \
+				server_cmd.o \
+				server_pwd.o \
+				handle_sigint.o \
 				handle_sigtstp.o \
 				interpret_status.o \
 				get_next_line.o \
@@ -70,7 +74,8 @@ all: $(NAMES)
 
 $(NAMES): %: $(SRC_DIR)%.c $(FT_LIB) $(SRC_COMPILED)
 	$(CC) -c $(FLAGS) $(HEADER_DIR) $< -o $@.o
-	$(CC) -o $@ $(FLAGS) $(LIBRARIES) $(HEADER_DIR) $(SRC_COMPILED) $@.o
+	@$(CC) -o $@ $(FLAGS) $(LIBRARIES) $(HEADER_DIR) $(SRC_COMPILED) $@.o
+	@echo "$(CC) -o $@ $(FLAGS) $(LIBRARIES) $(HEADER_DIR) SRC_COMPILED $@.o"
 
 $(SRC_COMPILED): %.o: $(SRC_DIR)%.c $(HEADER)
 	$(CC) -c $(FLAGS) $(HEADER_DIR) $< -o $@

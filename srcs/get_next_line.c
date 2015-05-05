@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/08 18:06:15 by tgauvrit          #+#    #+#             */
-/*   Updated: 2014/11/27 13:36:26 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/05 22:39:55 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,12 +77,12 @@ static int		read_to_spill(int const fd, t_spill *spill, char **line)
 {
 	int				ret;
 	int				spill_ret;
-	char			buf[BUF_SIZE + 1];
+	char			buf[GNL_BUF_SIZE + 1];
 
 	spill_ret = read_spill(spill, line);
 	if (spill_ret == -1 || spill_ret == 1)
 		return (spill_ret);
-	while ((ret = read(fd, buf, BUF_SIZE)) > 0)
+	while ((ret = read(fd, buf, GNL_BUF_SIZE)) > 0)
 	{
 		buf[ret] = '\0';
 		*line = spill->text;
@@ -102,7 +102,7 @@ int				get_next_line(int const fd, char **line)
 {
 	t_spill	*spill;
 
-	if (!line || BUF_SIZE < 1)
+	if (!line || GNL_BUF_SIZE < 1)
 		return (-1);
 	spill = get_spill(fd);
 	if (!spill)
