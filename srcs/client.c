@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/20 17:13:28 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/06 00:55:05 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/06 17:59:38 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,20 @@ int			main(int argc, char **argv, char **environ)
 }
 */
 
-int		create_client(int port, char *addr)
+void	handle_sigpipe(int signum)
+{
+	(void)signum;
+	shell_perror("Server connection lost!");
+}
+
+int		client_recv(int sock, char *buf, size_t length, int flags)
+{
+	ret = recv(sock, buf, BUF_SIZE, MSG_WAITALL);
+	if (ret < BUF_SIZE)
+		handle_sigpipe(0);
+}
+
+int		create_client(int port, char *addr, char *buf)
 {
 	int					sock;
 	struct protoent		*proto;
@@ -69,6 +82,8 @@ int		create_client(int port, char *addr)
 	sin.sin_addr.s_addr = inet_addr(addr);
 	if (connect(sock, (struct sockaddr *)&sin, sizeof(sin)))
 		shell_perror("can't assign requested address");
+	recv(sock, buf, BUF_SIZE, MSG_WAITALL);
+	ft_putendl(buf);
 	return (sock);
 }
 
@@ -85,65 +100,47 @@ void	client_do(int sock, char *buf)
 	else
 	{
 		server_sendstr(sock, buf);
-		ret = recv(sock, buf, BUF_SIZE, 0);
-		buf[ret] = '\0';
+		
 		ft_putendl(buf);
 	}
 }
 
-void	handle_sigpipe(int signum)
+void	client(int sock, char *path, char *buf)
 {
-	(void)signum;
-	shell_perror("Server connection lost!");
-}
-
-void	client(int sock, char *path)
-{
-	char	buf[BUF_SIZE + 1];
 	int		ret;
 
 	signal(SIGTSTP, exit);
 	signal(SIGPIPE, handle_sigpipe);
-	ft_putstr(WELCOME);
-	while (ft_putfourstr(path, " ", PROMPT, NULL), 1)
+	ft_putfourstr(WELCOME, path, " ", PROMPT);
+	while (ret = read(0, buf, BUF_SIZE), ret > 0)
 	{
-		if (ret = read(0, buf, BUF_SIZE), ret > 0)
-		{
-			buf[ret] = '\0';
-			if (ft_strequ(buf, "quit"))
-			{
-				server_sendstr(sock, buf);
-				ft_putstr(GOODBYE);
-				exit(0);
-			}
-			client_do(sock, buf);
-		}
+		if (ret == BUF_SIZE)
+			shell_pwarning(NULL, "command too long");
 		else
 		{
-			ft_putstr(GOODBYE);
-			exit(0);
+			buf[ret - 1] = '\0';
+			if (ft_strequ(buf, "quit"))
+				break;
+			client_do(sock, buf);
 		}
+		ft_putfourstr(path, " ", PROMPT, NULL);
 	}
+	server_sendstr(sock, "quit");
+	ft_putstr(GOODBYE);
+	exit(0);
 }
 
 int		main(int argc, char **argv)
 {
-	int		port;
 	int		sock;
-	int		ret;
 	char	buf[BUF_SIZE + 1];
-	char	*path;
 
+	buf[BUF_SIZE] = '\0';//Standard buf
 	if (argc != 3)
 		shell_perror("USAGE: ./client [machine] [port]");
-	port = ft_atoi(argv[2]);
-	sock = create_client(port, argv[1]);
-	ret = recv(sock, buf, BUF_SIZE, 0);
-	buf[ret] = '\0';
-	ft_putendl(buf);
-	path = ft_strjoin(argv[1], ":");
-	ft_strjoinfree(&path, argv[2]);
-	client(sock, path);
-	close(sock);
+	sock = create_client(ft_atoi(argv[2]), argv[1], buf);//argv[2] is the port
+	argv[1][ft_strlen(argv[1])] = ':';//dirty bypass
+	client(sock, argv[1], buf);//argv[1] is now path
+	// close(sock);
 	return (0);
 }

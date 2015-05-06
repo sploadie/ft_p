@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/20 17:13:28 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/05 23:19:36 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/06 17:35:55 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,24 +55,22 @@ int		server_do(int cs, char *cmd)
 	return (0);
 }
 
-void	handle_child(int cs)
+void	handle_child(int cs, unsigned short sin_port)
 {
 	int					ret;
 	char				buf[BUF_SIZE + 1];
 
-	printf("Client %d connected.\n", cs);
+	buf[BUF_SIZE] = '\0';
 	server_sendstr(cs, "SUCCESS: Welcome to sploadieFT_P");
 	server_pwd();
 	while (1)
 	{
-		if (ret = recv(cs, buf, BUF_SIZE, 0), ret > 0)
-		{
-			buf[ret - 1] = '\0';
-			printf("%d: [%s]\n", cs, buf);
-			server_do(cs , buf);
-		}
+		ret = recv(cs, buf, BUF_SIZE, MSG_WAITALL);
+		printf("%u: [%s]\n", sin_port, buf);
+		server_do(cs , buf);
 	}
 	close(cs);
+	exit(0);
 }
 
 void	server(int sock)
@@ -85,8 +83,10 @@ void	server(int sock)
 	while (1)
 	{
 		cs = accept(sock, (struct sockaddr *)&csin, &cslen);
+		printf("Client connected:\nsin_family: %i\nsin_port: %u\nsin_addr: %s\n", csin.sin_family, csin.sin_port, inet_ntoa(csin.sin_addr));//.s_addr));
 		if (pid = fork(), pid == 0)
-			handle_child(cs);
+			handle_child(cs, csin.sin_port);
+		close(cs);//Parent closes their copy of the socket. Probably.
 	}
 }
 
@@ -97,8 +97,7 @@ int		main(int argc, char **argv)
 
 	if (argc != 2)
 		shell_perror("USAGE: ./serveur [port]");
-	port = ft_atoi(argv[1]);
-	sock = create_server(port);
+	sock = create_server(ft_atoi(argv[1]));//argv[1] is port
 	server(sock);
 	close(sock);
 	return (0);
