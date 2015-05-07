@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/30 13:54:12 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/01/23 09:49:20 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/07 12:18:47 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	shell_perror(char *str)
 		ft_putstr_fd(str, 2);
 	else
 		ft_putstr_fd("(Error not provided)", 2);
-	ft_putstr_fd("\n\n", 2);
+	ft_putstr_fd("\n", 2);
 	exit(1);
 }
 

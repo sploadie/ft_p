@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/05 20:02:59 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/06 17:47:54 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/07 18:36:08 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,9 @@ void	server_ls(int cs)
 	output = ft_strdup("SUCCESS:");
 	while (ft_strjoinfree(&output, "\n"), entry = readdir(dir), entry != NULL)
 		ft_strjoinfree(&output, entry->d_name);
-	server_sendstr(cs, output);
+	closedir(dir);
+	server_sendint(cs, ft_strlen(output) + 1); //Send size of output first
+	server_sendstr(cs, output, ft_strlen(output) + 1);
 	free(output);
 }
 
@@ -33,36 +35,83 @@ void	server_mkdir(int cs, char *dirname)
 
 	if (ft_strchr(dirname, ' ') == NULL)
 	{
-		dirname -= 2;
-		ft_strcpy(dirname, "./");
 		if (mkdir(dirname, 0777) == 0)
-			message = "SUCCESS: ";
+			message = "SUCCESS: created directory ";
 		else
-			message = "ERROR: ";
+			message = "ERROR: failed to create directory ";
 		message = ft_strjoin(message, dirname);
-		server_sendstr(cs, message);
+		server_sendbuf(cs, message);
+		free(message);
 	}
 	else
-		server_sendstr(cs, "ERROR: Usage: mkdir [dirname]");
+		server_sendbuf(cs, "ERROR: Usage: mkdir [dirname]");
 }
 
-void	server_put(int cs, char *cmd)
+void	server_put(int cs, char *filename)
 {
-	(void)cs;
-	(void)cmd;
-	server_sendstr(cs, "FIXME");
+	int		file_size;
+	char	*file_contents;
+	int		fd;
+
+	file_size = server_recvint(cs);
+	file_contents = malloc(file_size * sizeof(char));
+	server_recvstr(cs, file_contents, file_size);
+	// if (ft_strchr(filename, ' ') != NULL)
+	// 	server_sendbuf(cs, "ERROR: Usage: put [file_path]");
+	/* else */if ((fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0777)) == -1)
+		server_sendbuf(cs, "ERROR: file creation failed");
+	else
+	{
+		if (write(fd, file_contents, file_size) == -1)
+			server_sendbuf(cs, "ERROR: file write failed");
+		else
+			server_sendbuf(cs, "SUCCESS: file written to server");
+		close(fd);
+	}
+	free(file_contents);
 }
 
-void	server_get(int cs, char *cmd)
+void	server_get(int cs, char *filename)
 {
 	(void)cs;
-	(void)cmd;
-	server_sendstr(cs, "FIXME");
+	(void)filename;
+	server_sendbuf(cs, "FIXME");
 }
 
-void	server_cd(int cs, char *cmd)
+void	server_cd(int cs, char *path)
 {
-	(void)cs;
-	(void)cmd;
-	server_sendstr(cs, "FIXME");
+	char	buf[BUF_SIZE];
+	size_t	len;
+	size_t	root_len;
+
+	if (chdir(path) == -1)
+	{
+		server_sendbuf(cs, "ERROR: invalid path");
+		return ;
+	}
+	len = ft_strlen(getcwd(buf, BUF_SIZE));
+	root_len = ft_strlen(server_root_dir());
+	if (len < root_len || ft_strncmp(buf, server_root_dir(), root_len) != 0)
+		chdir(server_root_dir());
+	server_pwd(cs);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

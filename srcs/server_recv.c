@@ -1,34 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server_pwd.c                                       :+:      :+:    :+:   */
+/*   server_recv.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/05/05 17:25:41 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/07 15:44:41 by tgauvrit         ###   ########.fr       */
+/*   Created: 2015/05/07 13:53:11 by tgauvrit          #+#    #+#             */
+/*   Updated: 2015/05/07 15:34:40 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_p.h"
 
-char	*server_root_dir(void)
+int		server_recvstr(int sock, char *buf, size_t length)
 {
-	static char	*pwd = NULL;
+	int		ret;
 
-	if (pwd == NULL)
-		pwd = getcwd(malloc(BUF_SIZE), BUF_SIZE);
-	return (pwd);
+	ret = recv(sock, buf, length, MSG_WAITALL);
+	if ((size_t)ret < length)
+		handle_signals(0);
+	return (ret);
 }
 
-void	server_pwd(int cs)
+int		server_recvbuf(int sock, char *buf)
 {
-	char	buf[BUF_SIZE];
-	char	*path;
+	return (server_recvstr(sock, buf, BUF_SIZE));
+}
 
-	getcwd(buf, BUF_SIZE);
-	path = ft_strjoin("SUCCESS: ", buf + ft_strlen(server_root_dir()));
-	ft_strjoinfree(&path, "/");
-	server_sendbuf(cs, path);
-	free(path);
+int		server_recvint(int sock)
+{
+	int		num;
+
+	server_recvstr(sock, (char *)&num, sizeof(int));
+	return (num);
 }

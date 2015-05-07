@@ -6,66 +6,11 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/20 17:13:28 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/06 17:59:38 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/07 16:24:30 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_p.h"
-
-/*
-static void	handle_input(char *str, t_env env)
-{
-	t_args		*args;
-	t_spl_func	*spl_function;
-	int			status;
-
-	status = 0;
-	args = parse_input_args(env, str, 1);
-	if ((spl_function = get_spl_function(args->args[0])))
-		(*spl_function)(args, env);
-	else if ((str = get_exec_path(env, args->args[0])))
-		fork_exec_with_env(str, args->args, env, status);
-	del_input_args(&args);
-}
-
-int			main(int argc, char **argv, char **environ)
-{
-	t_env		env;
-	char		*str;
-
-	(void)argc;
-	(void)argv;
-	env = init_shell_env(environ);
-	signal(SIGINT, handle_sigint);
-	signal(SIGCONT, handle_sigint);
-	ft_putstr(str = WELCOME);
-	while (1)
-	{
-		ft_putstr(PROMPT);
-		if (read_stdin(env, &str), !*str)
-		{
-			free(str);
-			continue ;
-		}
-		handle_input(str, env);
-	}
-	shell_perror("END OF MAIN REACHED");
-	return (0);
-}
-*/
-
-void	handle_sigpipe(int signum)
-{
-	(void)signum;
-	shell_perror("Server connection lost!");
-}
-
-int		client_recv(int sock, char *buf, size_t length, int flags)
-{
-	ret = recv(sock, buf, BUF_SIZE, MSG_WAITALL);
-	if (ret < BUF_SIZE)
-		handle_sigpipe(0);
-}
 
 int		create_client(int port, char *addr, char *buf)
 {
@@ -82,25 +27,29 @@ int		create_client(int port, char *addr, char *buf)
 	sin.sin_addr.s_addr = inet_addr(addr);
 	if (connect(sock, (struct sockaddr *)&sin, sizeof(sin)))
 		shell_perror("can't assign requested address");
-	recv(sock, buf, BUF_SIZE, MSG_WAITALL);
+	signal(SIGTSTP, handle_signals);
+	signal(SIGPIPE, handle_signals);
+	signal(SIGINT, handle_signals);
+	handle_signals(sock);// Give signal handler the sock to close
+	server_recvbuf(sock, buf);
 	ft_putendl(buf);
 	return (sock);
 }
 
 void	client_do(int sock, char *buf)
 {
-	int		ret;
-
 	if (ft_strequ(buf, "help"))
 		ft_putstr(HELP);
+	else if (ft_strequ(buf, "ls"))
+		client_ls(sock);
 	else if (ft_strncmp(buf, "get ", 4) == 0)
-		client_get(sock, buf);
+		client_get(sock, buf + 4);
 	else if (ft_strncmp(buf, "put ", 4) == 0)
-		client_put(sock, buf);
+		client_put(sock, buf + 4);
 	else
 	{
-		server_sendstr(sock, buf);
-		
+		server_sendbuf(sock, buf);
+		server_recvbuf(sock, buf);
 		ft_putendl(buf);
 	}
 }
@@ -109,8 +58,6 @@ void	client(int sock, char *path, char *buf)
 {
 	int		ret;
 
-	signal(SIGTSTP, exit);
-	signal(SIGPIPE, handle_sigpipe);
 	ft_putfourstr(WELCOME, path, " ", PROMPT);
 	while (ret = read(0, buf, BUF_SIZE), ret > 0)
 	{
@@ -123,9 +70,15 @@ void	client(int sock, char *path, char *buf)
 				break;
 			client_do(sock, buf);
 		}
+		//DEBUG
+		// ret = recv(sock, buf, BUF_SIZE, MSG_PEEK);
+		// ft_putstr("[");
+		// write(1, buf, ret);
+		// ft_putstr("]\n");
+		//DEBUG
 		ft_putfourstr(path, " ", PROMPT, NULL);
 	}
-	server_sendstr(sock, "quit");
+	server_sendbuf(sock, "quit");
 	ft_putstr(GOODBYE);
 	exit(0);
 }

@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/20 17:12:51 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/06 16:35:57 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/07 15:49:11 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,17 +131,29 @@
 */
 
 # define BUF_SIZE 1024
+# define SERVER_DIR "./server_space"
 
-void	server_sendstr(int cs, char *str);
-char	*server_pwd(void);
+void	handle_signals(int signum);
+
+char	*server_root_dir(void);
+
+void	server_sendstr(int cs, char *str, size_t length);
+void	server_sendbuf(int cs, char *str);
+void	server_sendint(int sock, int num);
+int		server_recvstr(int sock, char *buf, size_t length);
+int		server_recvbuf(int sock, char *buf);
+int		server_recvint(int sock);
+
 void	server_ls(int cs);
-void	server_cd(int cs, char *cmd);
+void	server_cd(int cs, char *path);
+void	server_pwd(int cs);
 void	server_get(int cs, char *cmd);
 void	server_put(int cs, char *cmd);
 void	server_mkdir(int cs, char *dirname);
+
+void	client_ls(int sock);
 void	client_get(int sock, char *buf);
 void	client_put(int sock, char *buf);
-
 
 /*
 ** Shell permitted functions:

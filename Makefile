@@ -6,7 +6,7 @@
 #    By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/20 16:35:37 by tgauvrit          #+#    #+#              #
-#    Updated: 2015/05/05 22:56:10 by tgauvrit         ###   ########.fr        #
+#    Updated: 2015/05/07 14:04:40 by tgauvrit         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,9 @@ FT_LIB_DIR =	./libft/
 
 SRC_DIR =		./srcs/
 
-SRC_COMPILED =	server_sendstr.o \
+SRC_COMPILED =	server_send.o \
+				server_recv.o \
+				handle_signals.o \
 				client_cmd.o \
 				server_cmd.o \
 				server_pwd.o \
