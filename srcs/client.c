@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/20 17:13:28 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/18 17:55:09 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/18 20:46:56 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int		create_client(int port, char *addr, char *buf)
 	signal(SIGTSTP, handle_signals);
 	signal(SIGPIPE, handle_signals);
 	signal(SIGINT, handle_signals);
-	handle_signals(sock);// Give signal handler the sock to close
+	handle_signals(sock);
 	server_recvbuf(sock, buf);
 	ft_putendl(buf);
 	return (sock);
@@ -67,15 +67,9 @@ void	client(int sock, char *path, char *buf)
 		{
 			buf[ret - 1] = '\0';
 			if (ft_strequ(buf, "quit"))
-				break;
+				break ;
 			client_do(sock, buf);
 		}
-		//DEBUG
-		// ret = recv(sock, buf, BUF_SIZE, MSG_PEEK);
-		// ft_putstr("[");
-		// write(1, buf, ret);
-		// ft_putstr("]\n");
-		//DEBUG
 		ft_putfourstr(path, " ", PROMPT, NULL);
 	}
 	server_sendbuf(sock, "quit");
@@ -88,12 +82,11 @@ int		main(int argc, char **argv)
 	int		sock;
 	char	buf[BUF_SIZE + 1];
 
-	buf[BUF_SIZE] = '\0';//Standard buf
+	buf[BUF_SIZE] = '\0';
 	if (argc != 3)
 		shell_perror("USAGE: ./client [machine] [port]");
-	sock = create_client(ft_atoi(argv[2]), argv[1], buf);//argv[2] is the port
-	argv[1][ft_strlen(argv[1])] = ':';//dirty bypass
-	client(sock, argv[1], buf);//argv[1] is now path
-	// close(sock);
+	sock = create_client(ft_atoi(argv[2]), argv[1], buf);
+	argv[1][ft_strlen(argv[1])] = ':';
+	client(sock, argv[1], buf);
 	return (0);
 }

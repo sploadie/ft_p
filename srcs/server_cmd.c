@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/05 20:02:59 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/18 18:24:56 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/18 20:47:24 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	server_ls(int cs)
 	while (ft_strjoinfree(&output, "\n"), entry = readdir(dir), entry != NULL)
 		ft_strjoinfree(&output, entry->d_name);
 	closedir(dir);
-	server_sendint(cs, ft_strlen(output) + 1); //Send size of output first
+	server_sendint(cs, ft_strlen(output) + 1);
 	server_sendstr(cs, output, ft_strlen(output) + 1);
 	free(output);
 }
@@ -115,23 +115,3 @@ void	server_cd(int cs, char *path)
 		chdir(server_root_dir());
 	server_pwd(cs);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

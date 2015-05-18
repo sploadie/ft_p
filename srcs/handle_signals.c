@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/07 14:03:53 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/18 17:48:09 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/18 20:47:04 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	handle_signals(int signum)
 		sock = signum;
 		return ;
 	}
-	if (sock == 0)// Server
+	if (sock == 0)
 		shell_perror("Server encountered an issue. Need a tissue?");
 	server_sendbuf(sock, "quit");
 	write(1, "\n", 1);
