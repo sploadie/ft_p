@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/20 17:13:28 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/18 17:48:35 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/18 17:55:09 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,9 @@ void	client_do(int sock, char *buf)
 	else if (ft_strequ(buf, "ls"))
 		client_ls(sock);
 	else if (ft_strncmp(buf, "get ", 4) == 0)
-		client_get(sock, buf + 4);
+		client_get(sock, buf);
 	else if (ft_strncmp(buf, "put ", 4) == 0)
-		client_put(sock, buf + 4);
+		client_put(sock, buf);
 	else
 	{
 		server_sendbuf(sock, buf);

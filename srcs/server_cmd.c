@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/05 20:02:59 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/18 17:50:21 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/18 18:24:56 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,9 +83,13 @@ void	server_get(int cs, char *filename)
 		server_sendint(cs, -1);
 		server_sendbuf(cs, "ERROR: file open failed");
 	}
+	else if (fstat(fd, &file_stat), S_ISDIR(file_stat.st_mode))
+	{
+		server_sendint(cs, -1);
+		server_sendbuf(cs, "ERROR: file is a directory");
+	}
 	else
 	{
-		fstat(fd, &file_stat);
 		server_sendint(cs, file_stat.st_size);
 		while ((ret = read(fd, buf, BUF_SIZE)) > 0)
 			send(cs, buf, ret, 0);
