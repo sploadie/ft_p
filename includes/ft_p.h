@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/20 17:12:51 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/07 15:49:11 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/18 19:00:33 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,45 +59,67 @@
 ** 								STREAM: provides sequenced, reliable,
 ** 										two-way connection based byte streams
 ** 								DGRAM: supports datagrams
-** 										(connectionless, unreliable messages of a
+** 										(connectionless, unreliable messages of
 ** 										fixed (typically small) maximum length)
 ** 								RAW: provides access to internal network
 ** 										protocols and interfaces
 ** 								SEQPACKET: presently implemented only for PF_NS
 ** 								RDM: not yet implemented
 ** 							protocol: see protocols(5)
-** setsockopt		(2) int setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_len);
+** setsockopt		(2) int setsockopt(int socket, int level, int option_name,
+**								const void *option_value, socklen_t option_len);
 ** 							socket: socket in question
 ** 							level: options at the socket level: SOL_SOCKET
-** 								at any other level the protocol number of the appropriate protocol controlling the option is supplied
-** 								for example, to indicate that an option is to be interpreted by the TCP protocol,
-** 								level should be set to the protocol number of TCP; see getprotoent(3)
+** 								at any other level the protocol number of the
+**								appropriate protocol controlling the option is
+**								supplied
+**								for example, to indicate that an option is to be
+**								interpreted by the TCP protocol,
+** 								level should be set to the protocol number of
+**								TCP; see getprotoent(3)
 ** 							option_name:
 ** 							option_value: may be NULL
 ** 							option_len:
-** getsockname		(2) int getsockname(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len);
+** getsockname		(2) int getsockname(int socket, struct sockaddr *restrict
+**								address, socklen_t *restrict address_len);
 ** 							socket: socket in question
-** 							address: contains address structure on return (must be allocated)
-** 							address_len: contains address size on return (initially should be allocated size)
+** 							address: contains address structure on return
+**								(must be allocated)
+** 							address_len: contains address size on return
+**								(initially should be allocated size)
 ** getprotobyname	(3) struct protoent *getprotobyname(const char *name);
 ** 							name: name of protocol you want (use "tcp")
 ** 							returns protocol struct, or null if error
 ** gethostbyname	(3) struct hostent *gethostbyname(const char *name);
 ** 							getaddrinfo(3) is preferred over gethostbyname(3)
-** getaddrinfo		(3) int getaddrinfo(const char *hostname, const char *servname, const struct addrinfo *hints, struct addrinfo **res);
-** 							hostname: valid host name OR numeric host address string (dotted decimal IPv4/IPv6 address)
-** 							servname: decimal port number OR service name listed in services(5)
+** getaddrinfo		(3) int getaddrinfo(const char *hostname,
+**								const char *servname,
+**								const struct addrinfo *hints,
+**								struct addrinfo **res);
+** 							hostname: valid host name OR numeric host address
+**								string (dotted decimal IPv4/IPv6 address)
+** 							servname: decimal port number OR service name
+**								listed in services(5)
 ** 								(hostname and/or servname must be non-NULL)
-** 							hints: optional pointer to a struct addrinfo, as defined by <netdb.h> (see MAN)
-** 							res: on success, *res is a pointer to a linked list of one or more addrinfo structures:
-** 								traverse list by following the 'ai_next' pointers until a null pointer is encountered
-** 								'ai_family', 'ai_socktype', and 'ai_protocol' in each struct are suitable for a call to socket(2)
-** 								for each struct in the list, the 'ai_addr' member points to a socket address struct of length 'ai_addrlen'
-** bind				(2) int bind(int socket, const struct sockaddr *address, socklen_t address_len);
+** 							hints: optional pointer to a struct addrinfo,
+**								as defined by <netdb.h> (see MAN)
+** 							res: on success, *res is a pointer to a linked
+**								list of one or more addrinfo structures:
+** 								traverse list by following the 'ai_next'
+**								pointers until a null pointer is encountered
+** 								'ai_family', 'ai_socktype', and 'ai_protocol'
+**								in each struct are suitable for a call to
+**								socket(2)
+** 								for each struct in the list, the 'ai_addr'
+**								member points to a socket address struct of
+**								length 'ai_addrlen'
+** bind				(2) int bind(int socket, const struct sockaddr *address,
+**								socklen_t address_len);
 ** 							socket: local socket
 ** 							address: address to be assigned to socket
 ** 							address_len:
-** connect			(2) int connect(int socket, const struct sockaddr *address, socklen_t address_len);
+** connect			(2) int connect(int socket, const struct sockaddr *address,
+**								socklen_t address_len);
 ** 							socket: local socket
 ** 							address: address of socket trying to connect to
 ** 							address_len: size of address?
@@ -105,10 +127,13 @@
 ** listen			(2) int listen(int socket, int backlog);
 ** 							socket: socket which wants to listen
 ** 							backlog: max number of queuing connections (1)
-** accept			(2) int accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len);
+** accept			(2) int accept(int socket,
+**								struct sockaddr *restrict address,
+**								socklen_t *restrict address_len);
 ** 							socket: socket which wants to listen
 ** 							address: fills in with info
-** 							address_len: contains address size on return (initially should be allocated size)
+** 							address_len: contains address size on return
+**								(initially should be allocated size)
 ** 							contains fd upon success, -1 on failure
 ** htons			(3) uint16_t htons(uint16_t hostshort);
 ** htonl			(3) uint32_t htonl(uint32_t hostlong);
@@ -116,7 +141,8 @@
 ** ntohl			(3) uint32_t ntohs(uint16_t netshort);
 ** inet_addr		(3)
 ** inet_ntoa		(3)
-** send				(2) ssize_t send(int socket, const void *buffer, size_t length, int flags);
+** send				(2) ssize_t send(int socket, const void *buffer,
+**								size_t length, int flags);
 ** recv				(2)
 ** execv			(2)
 ** execl			(2)
@@ -133,27 +159,27 @@
 # define BUF_SIZE 1024
 # define SERVER_DIR "./server_space"
 
-void	handle_signals(int signum);
+void					handle_signals(int signum);
 
-char	*server_root_dir(void);
+char					*server_root_dir(void);
 
-void	server_sendstr(int cs, char *str, size_t length);
-void	server_sendbuf(int cs, char *str);
-void	server_sendint(int sock, int num);
-int		server_recvstr(int sock, char *buf, size_t length);
-int		server_recvbuf(int sock, char *buf);
-int		server_recvint(int sock);
+void					server_sendstr(int cs, char *str, size_t length);
+void					server_sendbuf(int cs, char *str);
+void					server_sendint(int sock, int num);
+int						server_recvstr(int sock, char *buf, size_t length);
+int						server_recvbuf(int sock, char *buf);
+int						server_recvint(int sock);
 
-void	server_ls(int cs);
-void	server_cd(int cs, char *path);
-void	server_pwd(int cs);
-void	server_get(int cs, char *cmd);
-void	server_put(int cs, char *cmd);
-void	server_mkdir(int cs, char *dirname);
+void					server_ls(int cs);
+void					server_cd(int cs, char *path);
+void					server_pwd(int cs);
+void					server_get(int cs, char *cmd);
+void					server_put(int cs, char *cmd);
+void					server_mkdir(int cs, char *dirname);
 
-void	client_ls(int sock);
-void	client_get(int sock, char *buf);
-void	client_put(int sock, char *buf);
+void					client_ls(int sock);
+void					client_get(int sock, char *buf);
+void					client_put(int sock, char *buf);
 
 /*
 ** Shell permitted functions:
