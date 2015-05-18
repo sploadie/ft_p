@@ -6,7 +6,7 @@
 /*   By: tgauvrit <tgauvrit@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/05 20:02:59 by tgauvrit          #+#    #+#             */
-/*   Updated: 2015/05/07 18:36:08 by tgauvrit         ###   ########.fr       */
+/*   Updated: 2015/05/18 17:50:21 by tgauvrit         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,9 @@ void	server_put(int cs, char *filename)
 	file_size = server_recvint(cs);
 	file_contents = malloc(file_size * sizeof(char));
 	server_recvstr(cs, file_contents, file_size);
-	// if (ft_strchr(filename, ' ') != NULL)
-	// 	server_sendbuf(cs, "ERROR: Usage: put [file_path]");
-	/* else */if ((fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0777)) == -1)
+	if (ft_strrchr(filename, '/') != NULL)
+		filename = ft_strrchr(filename, '/') + 1;
+	if ((fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0777)) == -1)
 		server_sendbuf(cs, "ERROR: file creation failed");
 	else
 	{
@@ -73,9 +73,25 @@ void	server_put(int cs, char *filename)
 
 void	server_get(int cs, char *filename)
 {
-	(void)cs;
-	(void)filename;
-	server_sendbuf(cs, "FIXME");
+	int			fd;
+	int			ret;
+	char		buf[BUF_SIZE];
+	struct stat	file_stat;
+
+	if ((fd = open(filename, O_RDONLY)) == -1)
+	{
+		server_sendint(cs, -1);
+		server_sendbuf(cs, "ERROR: file open failed");
+	}
+	else
+	{
+		fstat(fd, &file_stat);
+		server_sendint(cs, file_stat.st_size);
+		while ((ret = read(fd, buf, BUF_SIZE)) > 0)
+			send(cs, buf, ret, 0);
+		close(fd);
+		server_sendbuf(cs, "SUCCESS: file read from server");
+	}
 }
 
 void	server_cd(int cs, char *path)
